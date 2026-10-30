@@ -13,16 +13,29 @@ create table if not exists public.ttt_rooms (
   winning_line jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now()
 );
+
 alter table public.ttt_rooms enable row level security;
+grant usage on schema public to anon, authenticated;
+grant select, insert, update on public.ttt_rooms to anon, authenticated;
+
 drop policy if exists "Demo rooms can be read by anyone" on public.ttt_rooms;
-create policy "Demo rooms can be read by anyone" on public.ttt_rooms for select to anon, authenticated using (true);
+create policy "Demo rooms can be read by anyone"
+  on public.ttt_rooms for select to anon, authenticated using (true);
+
 drop policy if exists "Demo rooms can be created by anyone" on public.ttt_rooms;
-create policy "Demo rooms can be created by anyone" on public.ttt_rooms for insert to anon, authenticated with check (true);
+create policy "Demo rooms can be created by anyone"
+  on public.ttt_rooms for insert to anon, authenticated with check (true);
+
 drop policy if exists "Demo rooms can be updated by anyone" on public.ttt_rooms;
-create policy "Demo rooms can be updated by anyone" on public.ttt_rooms for update to anon, authenticated using (true) with check (true);
+create policy "Demo rooms can be updated by anyone"
+  on public.ttt_rooms for update to anon, authenticated using (true) with check (true);
+
+alter table public.ttt_rooms replica identity full;
+
 do $$
 begin
   alter publication supabase_realtime add table public.ttt_rooms;
-exception when duplicate_object then null;
-when undefined_object then raise notice 'Enable Realtime for ttt_rooms in Supabase dashboard.';
+exception
+  when duplicate_object then null;
+  when undefined_object then raise notice 'Enable Realtime for ttt_rooms in Supabase dashboard.';
 end $$;
