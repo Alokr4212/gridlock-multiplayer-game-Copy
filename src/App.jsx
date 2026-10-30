@@ -1,3 +1,4 @@
+import React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { ArrowLeft, Check, Copy, Crown, LoaderCircle, RotateCcw, Share2, Sparkles, Users, Wifi } from 'lucide-react';
